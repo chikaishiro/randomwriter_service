@@ -1,6 +1,9 @@
 package com.example.randomwriter;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +17,38 @@ public class RandomwriterController {
     private Scanner inputFile;
     private Map<Queue<String>,ArrayList<String >> dic;
     private String content;
+    private List<String> user_login=new ArrayList<>();
+    private Map<String,String> user_info=new HashMap<>();
 
+    @RequestMapping("/register")
+    public Randomwriter register(@RequestParam(value="name",defaultValue="pipipan")String name,
+                                 @RequestParam(value="password",defaultValue = "990119")String password){
+        user_info.put(name,password);
+        return new Randomwriter(counter.incrementAndGet(),"register successfully");
+    }
+
+    @RequestMapping("/login")
+    public Randomwriter login(@RequestParam(value="name",defaultValue="pipipan")String name,
+                                 @RequestParam(value="password",defaultValue = "990119")String password){
+        String user_password=user_info.getOrDefault(name,"");
+        if (user_password.equals(password)) {
+            user_login.add(name);
+            content="login successfully!";
+        }
+        else content="Please register firstly";
+        return new Randomwriter(counter.incrementAndGet(),content);
+    }
     @RequestMapping("/randomwriter")
     public Randomwriter randomwriter(@RequestParam(value="N", defaultValue="3") String N,
-                 @RequestParam(value="words", defaultValue="0") String words) throws Exception {
+                 @RequestParam(value="words", defaultValue="0") String words,@RequestParam(value="name",defaultValue = "")String name) throws Exception {
+        boolean flag=false;
+        for (String s:user_login){
+            if(s.equals(name)){
+                flag=true;
+                break;
+            }
+        }
+        if (!flag) return new Randomwriter(counter.incrementAndGet(),"not login");
         init();
         process(Integer.parseInt(N));
         start(Integer.parseInt(words));
@@ -25,8 +56,9 @@ public class RandomwriterController {
     }
 
     public void init() throws IOException{
-        String fileName;
-        fileName="C:\\Users\\Administrator\\IdeaProjects\\randomwriter\\src\\main\\resources\\static\\hamlet.txt";
+        content="";
+        String fileName="C:\\Users\\singularity\\IdeaProjects\\randomwriter_service\\src\\main\\resources\\static\\hamlet.txt";
+        fileName=Thread.currentThread().getContextClassLoader().getResource("").getPath()+"/static/hamlet.txt";
         inputFile=new Scanner(new File(fileName));
         //System.out.println(inputFile.next());
         //out=new PrintWriter("123
