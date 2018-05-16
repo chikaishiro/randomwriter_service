@@ -6,6 +6,8 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,7 +61,8 @@ public class RandomwriterController {
         content="";
         String fileName="C:\\Users\\singularity\\IdeaProjects\\randomwriter_service\\src\\main\\resources\\static\\hamlet.txt";
         fileName=Thread.currentThread().getContextClassLoader().getResource("").getPath()+"/static/hamlet.txt";
-        inputFile=new Scanner(new File(fileName));
+        ClassPathResource cpr=new ClassPathResource("static/hamlet.txt");
+        inputFile=new Scanner(cpr.getFile());
         //System.out.println(inputFile.next());
         //out=new PrintWriter("123
         //out.println("123");
